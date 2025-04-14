@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from brping import Ping1D
 
 myPing = Ping1D()

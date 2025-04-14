@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # RUNS ON STARTUP
 
 from RPLCD.i2c import CharLCD

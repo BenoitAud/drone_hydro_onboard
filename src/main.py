@@ -50,10 +50,7 @@ else:
     print("Bravo petit canard, tu as réussi ton acquisition \n")
     LCD1602.write(0, 0, "Ready")
 
-####################################################### Parametres pour le
-GPS
-###########################################################################
-########
+####################################################### Parametres pour le GPS ###################################################################################
 
 # Parametrage -- Modifiable !!
 port = "/dev/ttyACM0" # port USB du GPS, vérifier via la commande dmesg |grep tty
@@ -74,9 +71,7 @@ with open("/home/pi/logs/GPS/GPS.txt", "a+") as f:
     f.write("$, Heure (UTC), Latitude, Hemisphere Lat, Longitude, Hemisphere Long, quality indicator, Nb satellites. HDOP, Altitude, Unit, Geoidal separation, Unit, Age of diff. data, Difference ref station ID")
 #All the columns NMEA format
 
-####################################################### Parametres pour la temperature
-###########################################################################
-########
+####################################################### Parametres pour la temperature ###################################################################################
 input_folder = '/sys/bus/w1/devices'
 output_folder = '/home/pi/logs/temperature'
 global ds18b20
@@ -86,9 +81,7 @@ for i in os.listdir(input_folder):
 t
 emp_addr = input_folder + '/' + ds18b20 + '/w1_slave'
 
-####################################################### C'est parti pour une acquisition en continu !!!
-###########################################################################
-########
+####################################################### C'est parti pour une acquisition en continu !!! ###################################################################################
 # Initialisation des variables
 i_failure = 0 #nombre de fois que le sonar n'arrive pas a se connecter, garder en memoire pour un reboot apres 5 erreurs.
 i_time = 0 # permet de definir le temps initial pour respect de la duree d'acquisition fixee par l'utilisateur
