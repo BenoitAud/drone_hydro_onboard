@@ -18,7 +18,7 @@ myPing.initialize()
 myPing.set_speed_of_sound(int(ss(26.0)))
 #print("Sound velocity updated (mm/s): ", ss(tC))
 
-lcd = CharLCD('PCF8574', 0x27) # 0x27 for 16x2, 0x3F for 20x4
+lcd = CharLCD('PCF8574', 0x27) # 0x27 for 20x4
 lcd.clear()
 
 while True:
