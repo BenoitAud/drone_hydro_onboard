@@ -1,4 +1,4 @@
-duree: 0.1        # Temps d'acquisition en minutes
+duree: 1        # Temps d'acquisition en minutes
 tC: 20          # Température de l'eau en degrés Celsius
 tF: 60          # Température de l'eau en degrés Fahrenheit
 port_sonar: "/dev/ttyUSB0"  # Port série du sonar
@@ -7,5 +7,5 @@ baud_rate_gps: 9600  # Baud rate du GPS
 baud_rate_sonar: 115200  # Baud rate du sonar
 pin_button: 15  # Numéro de la broche GPIO pour le bouton
 logs_path: "/mnt/hdd/logs"  # Chemin vers le dossier de logs (sur le disque dur)
-fallback_logs_path: "/home/dronehydro/main_ws/logs"
+fallback_logs_path: "/home/dronehydro/main_ws/logs" # Chemin de backup pour les logs si le disque dur n'est pas accessible
 log_name_format: "%Y-%m-%d_%H-%M-%S"  # Default format for log filenames
