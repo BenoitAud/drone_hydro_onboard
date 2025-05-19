@@ -1,7 +1,4 @@
-# Ce script sert a l'acquisition des mesures de distance produites par le sonar Ping2.
-# Il utilise un GPS branché sur USB, un capteur de température (célérité du son), ainsi que le sonar Ping2.
-# Suppose que le sonar occupe le port /dev/ttyUSB0 avec un baud rate de 115200
-# Suppose que le GPS occupe le port USB /dev/ttyACM0 avec un baud rate de 9600
+# PROGRAMME D'ACQUISITION DE DONNÉES SONAR ET GPS
 
 import time as tiime
 from brping import Ping1D
