@@ -94,7 +94,7 @@ port_gps           = params.get("port_gps", "/dev/ttyACM0")
 baud_rate_sonar    = params.get("baud_rate_sonar", 115200)
 baud_rate_gps      = params.get("baud_rate_gps", 9600)
 pin_button         = params.get("pin_button", 15)
-logs_path          = params.get("logs_path", "/mnt/hdd/logs")
+logs_path          = params.get("logs_path", "/mnt/ssd/logs")
 fallback_logs_path = params.get("fallback_logs_path", "/home/dronehydro/main_ws/logs")
 log_name_format    = params.get("log_name_format", "%Y-%m-%d_%H-%M-%S")
 restart_timeout    = params.get("restart_timeout", 5)
@@ -106,16 +106,54 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 # Verify primary log path; if inaccessible, immediately fallback
+original_primary_path = str(logs_path)
+current_logs_path_is_fallback = False
+
 try:
-    mount_result = subprocess.run(["mountpoint", "-q", logs_path], timeout=0.5, check=False)
-    if mount_result.returncode != 0 or not (os.path.isdir(logs_path) and os.access(logs_path, os.W_OK)):
-        print(f"WARNING: Primary log path '{logs_path}' is not accessible. Using fallback.")
+    # Primary check: Is it a directory and is it writable?
+    is_dir = os.path.isdir(original_primary_path)
+    is_writable = os.access(original_primary_path, os.W_OK)
+
+    if is_dir and is_writable:
+        # Path is a writable directory. This is the primary requirement.
+        print(f"INFO: Primary log path '{original_primary_path}' is a writable directory.")
+        
+        # Optionally, check if it's a mountpoint and log information.
+        # This check will not cause a fallback if the path is already deemed a writable directory.
+        try:
+            mount_result = subprocess.run(["mountpoint", "-q", original_primary_path], timeout=0.5, check=False)
+            if mount_result.returncode != 0:
+                print(f"NOTE: Primary log path '{original_primary_path}' is not a mountpoint itself (mountpoint check exit code: {mount_result.returncode}). Proceeding with this path as it is writable.")
+            else:
+                print(f"INFO: Primary log path '{original_primary_path}' is also a mountpoint.")
+        except (subprocess.TimeoutExpired, OSError) as mount_e:
+            print(f"NOTE: Could not verify if primary log path '{original_primary_path}' is a mountpoint: {mount_e}. Proceeding as it is a writable directory.")
+        # logs_path remains as original_primary_path
+    
+    else:
+        # Primary path is not a writable directory, so fall back.
+        reasons = []
+        if not is_dir:
+            reasons.append(f"'{original_primary_path}' is not a directory")
+        # Only check writability if it was a directory but not writable
+        elif not is_writable: 
+            reasons.append(f"'{original_primary_path}' is not writable")
+        
+        reason_str = "; ".join(reasons) if reasons else f"'{original_primary_path}' is not a suitable writable directory"
+        print(f"WARNING: {reason_str}. Using fallback log path.")
+        
         logs_path = fallback_logs_path
-    print(f"INFO: Primary log path '{logs_path}' is accessible.")
-except (subprocess.TimeoutExpired, OSError) as e:
-    print(f"WARNING: {e}. Using fallback logs path: {fallback_logs_path}")
+        current_logs_path_is_fallback = True
+        os.makedirs(logs_path, exist_ok=True) # Ensure fallback path is created
+        print(f"INFO: Using fallback log path '{logs_path}'.")
+
+except OSError as e: 
+    # This catches OS-level errors from os.path.isdir, os.access (e.g., permission denied to stat path)
+    print(f"WARNING: OS error while checking primary log path '{original_primary_path}': {e}. Using fallback: {fallback_logs_path}")
     logs_path = fallback_logs_path
-    os.makedirs(logs_path, exist_ok=True)
+    current_logs_path_is_fallback = True
+    os.makedirs(logs_path, exist_ok=True) # Ensure fallback path is created
+    print(f"INFO: Using fallback log path '{logs_path}'.")
 
 # Initialize LCD
 lcd = CharLCD('PCF8574', 0x27)  # 0x27 for 20x4
